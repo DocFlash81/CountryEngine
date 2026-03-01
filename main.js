@@ -14,20 +14,25 @@ fetch("world.geojson")
 
     const southAmericaLayer = L.geoJSON(data, {
 
-      filter: function(feature) {
-        return feature.properties.CONTINENT === "South America";
-      },
+  filter: function(feature) {
+    return feature.properties.CONTINENT === "South America";
+  },
 
-      style: function() {
-        return {
-          color: "#0033cc",
-          weight: 2,
-          fillOpacity: 0.3
-        };
-      }
+  style: function() {
+    return {
+      color: "#0033cc",
+      weight: 2,
+      fillOpacity: 0.3
+    };
+  },
 
+  onEachFeature: function(feature, layer) {
+    layer.on("click", function() {
+      console.log(feature.properties.NAME);
     });
+  }
 
+});
     southAmericaLayer.addTo(MyMap);
 
   });
