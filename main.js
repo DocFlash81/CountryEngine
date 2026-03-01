@@ -3,10 +3,11 @@ console.log("JS loaded");
 // Create the map
 const MyMap = L.map('mapbox').setView([-15, -60], 4);
 
-// Add tile layer (the base map)
+// Add tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(MyMap);
+
 // Load GeoJSON
 fetch("world.geojson")
   .then(response => response.json())
@@ -27,14 +28,13 @@ fetch("world.geojson")
       },
 
       onEachFeature: function (feature, layer) {
-
         layer.bindTooltip(feature.properties.NAME, {
           sticky: true
         });
       }
-    }
 
-});
-southAmericaLayer.addTo(MyMap);
+    });
+
+    southAmericaLayer.addTo(MyMap);
 
   });
