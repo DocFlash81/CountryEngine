@@ -22,8 +22,7 @@ fetch("SALite.csv")
         PolityID: cols[0].trim(),
         Name: cols[1].trim(),
         StartDate: cols[2].trim(),
-        EndDate: cols[3].trim(),
-        DisplayName: cols[4].trim()
+        EndDate: cols[3].trim()
       };
     });
 
@@ -62,7 +61,7 @@ fetch("world.geojson")
           console.log("Matches:", matches);
 
           document.getElementById("info").innerText =
-            matches.map(m => m.DisplayName + " (" + m.StartDate + "-" + m.EndDate + ")").join("\n");
+            matches.map(m => m.Name + " (" + m.StartDate + "-" + m.EndDate + ")").join("\n");
 
         });
       }
