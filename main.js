@@ -51,17 +51,20 @@ fetch("world.geojson")
 
       onEachFeature: function (feature, layer) {
 
+        // Hover tooltip
+        layer.bindTooltip(feature.properties.NAME, {
+          sticky: true
+        });
+
+        // Click behavior
         layer.on("click", function () {
 
           const countryName = feature.properties.NAME;
 
           const matches = sovData.filter(row => row.Name === countryName);
 
-          console.log("Clicked:", countryName);
-          console.log("Matches:", matches);
-
           document.getElementById("info").innerText =
-            matches.map(m => m.Name + " (" + m.StartDate + "-" + m.EndDate + ")").join("\n");
+            matches.map(m => m.PolityID + " (" + m.StartDate + "-" + m.EndDate + ")").join("\n");
 
         });
       }
