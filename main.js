@@ -28,9 +28,10 @@ fetch("world.geojson")
 
   onEachFeature: function(feature, layer) {
   layer.on("click", function() {
-    const countryName = feature.properties.NAME;
-    document.getElementById("info").innerText = countryName;
+    console.log("clicked", feature.properties.NAME);
+    document.getElementById("info").innerText = "CLICK WORKED";
   });
+}
 }
 
 });
