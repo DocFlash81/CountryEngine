@@ -3,10 +3,19 @@
   height: 600px;
 }
 
+
+.leaflet-interactive:focus {
+  outline: none;
+}
+
 #info {
   font-family: Consolas, "Courier New", monospace;
 }
 
-.leaflet-interactive:focus {
-  outline: none;
+
+#info {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 16px;
+  line-height: 1.4;
+  margin-bottom: 10px;
 }

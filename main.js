@@ -10,16 +10,16 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Helper function for date presentation
 function formatDate(yyyymmdd) {
-  const year  = yyyymmdd.substring(0,4);
-  const month = yyyymmdd.substring(4,6);
-  const day   = yyyymmdd.substring(6,8);
+  const year = yyyymmdd.substring(0, 4);
+  const month = yyyymmdd.substring(4, 6);
+  const day = yyyymmdd.substring(6, 8);
 
   const monthNames = [
-    "Jan","Feb","Mar","Apr","May","Jun",
-    "Jul","Aug","Sep","Oct","Nov","Dec"
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
-  return `${year} ${monthNames[parseInt(month,10)-1]} ${parseInt(day,10)}`;
+  return `${year} ${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
 }
 
 // Load sovereignty data
@@ -75,8 +75,10 @@ fetch("world.geojson")
 
           const countryName = feature.properties.NAME;
 
-          const matches = sovData.filter(row => row.Name === countryName);
-
+          const matches = sovData
+            .filter(row => row.Name === countryName)
+            .sort((a, b) => a.StartDate.localeCompare(b.StartDate));
+            
           document.getElementById("info").innerText =
             matches.map(m => m.Name + " - " + m.PolityID + " (" +
               formatDate(m.StartDate) + " - " + formatDate(m.EndDate) + ")").join("\n");
