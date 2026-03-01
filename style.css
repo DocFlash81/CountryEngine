@@ -6,3 +6,7 @@
 #info {
   font-family: Consolas, "Courier New", monospace;
 }
+
+.leaflet-interactive:focus {
+  outline: none;
+}
