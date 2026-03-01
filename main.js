@@ -27,10 +27,11 @@ fetch("world.geojson")
   },
 
   onEachFeature: function(feature, layer) {
-    layer.on("click", function() {
-      console.log(feature.properties.NAME);
-    });
-  }
+  layer.on("click", function() {
+    const countryName = feature.properties.NAME;
+    document.getElementById("info").innerText = countryName;
+  });
+}
 
 });
     southAmericaLayer.addTo(MyMap);
