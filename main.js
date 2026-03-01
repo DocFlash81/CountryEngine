@@ -1,4 +1,4 @@
-console.log("Country Engine starting...");
+console.log("JS loaded");
 
 // Create the map
 const MyMap = L.map('mapbox').setView([-15, -60], 4);
