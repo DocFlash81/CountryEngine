@@ -10,7 +10,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Load sovereignty data
 let sovData = [];
-
 fetch("SALite.csv")
   .then(response => response.text())
   .then(text => {
@@ -20,8 +19,8 @@ fetch("SALite.csv")
     sovData = rows.map(row => {
       const cols = row.split(",");
       return {
-        Country: cols[0].trim(),
-        PolityID: cols[1].trim(),
+        PolityID: cols[0].trim(),
+        Name: cols[1].trim(),
         StartDate: cols[2].trim(),
         EndDate: cols[3].trim(),
         DisplayName: cols[4].trim()
@@ -66,11 +65,7 @@ fetch("world.geojson")
             matches.map(m => m.DisplayName + " (" + m.StartDate + "-" + m.EndDate + ")").join("\n");
 
         });
-
       }
-
     });
-
     southAmericaLayer.addTo(MyMap);
-
   });
