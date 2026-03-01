@@ -52,9 +52,21 @@ fetch("world.geojson")
       },
 
       onEachFeature: function (feature, layer) {
-        layer.bindTooltip(feature.properties.NAME, {
-          sticky: true
+
+        layer.on("click", function () {
+
+          const countryName = feature.properties.NAME;
+
+          const matches = sovData.filter(row => row.Country === countryName);
+
+          console.log("Clicked:", countryName);
+          console.log("Matches:", matches);
+
+          document.getElementById("info").innerText =
+            matches.map(m => m.DisplayName + " (" + m.StartDate + "-" + m.EndDate + ")").join("\n");
+
         });
+
       }
 
     });
