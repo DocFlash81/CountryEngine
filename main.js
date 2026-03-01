@@ -55,7 +55,7 @@ fetch("world.geojson")
 
           const countryName = feature.properties.NAME;
 
-          const matches = sovData.filter(row => row.Country === countryName);
+          const matches = sovData.filter(row => row.Name === countryName);
 
           console.log("Clicked:", countryName);
           console.log("Matches:", matches);
