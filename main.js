@@ -12,7 +12,22 @@ fetch("world.geojson")
   .then(response => response.json())
   .then(data => {
 
-    const worldLayer = L.geoJSON(data);
-    worldLayer.addTo(MyMap);
+    const southAmericaLayer = L.geoJSON(data, {
+
+      filter: function(feature) {
+        return feature.properties.CONTINENT === "South America";
+      },
+
+      style: function() {
+        return {
+          color: "#0033cc",
+          weight: 2,
+          fillOpacity: 0.3
+        };
+      }
+
+    });
+
+    southAmericaLayer.addTo(MyMap);
 
   });
