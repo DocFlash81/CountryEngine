@@ -79,7 +79,7 @@ fetch("world.geojson")
 
           document.getElementById("info").innerText =
             matches.map(m => m.Name + " - " + m.PolityID + " (" +
-              formatDate(m.StartDate) + "-" + formatDate(m.EndDate) + ")").join("\n");
+              formatDate(m.StartDate) + " - " + formatDate(m.EndDate) + ")").join("\n");
 
         });
       }

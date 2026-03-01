@@ -2,3 +2,7 @@
   width: 800px;
   height: 600px;
 }
+
+#info {
+  font-family: Consolas, "Courier New", monospace;
+}
