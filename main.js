@@ -20,11 +20,11 @@ fetch("SALite.csv")
     sovData = rows.map(row => {
       const cols = row.split(",");
       return {
-        Country: cols[0],
-        PolityID: cols[1],
-        StartDate: cols[2],
-        EndDate: cols[3],
-        DisplayName: cols[4]
+        Country: cols[0].trim(),
+        PolityID: cols[1].trim(),
+        StartDate: cols[2].trim(),
+        EndDate: cols[3].trim(),
+        DisplayName: cols[4].trim()
       };
     });
 
