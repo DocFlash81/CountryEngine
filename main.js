@@ -80,8 +80,8 @@ fetch("world.geojson")
             .sort((a, b) => a.StartDate.localeCompare(b.StartDate));
 
           document.getElementById("info").innerText =
-            matches.map(m => m.Name + " - " + m.PolityID + " (" +
-              formatDate(m.StartDate) + " - " + formatDate(m.EndDate) + ")").join("\n");
+            matches.map(m => m.Name + "\u2014" + m.PolityID + " (" +
+              formatDate(m.StartDate) + "\u2014" + formatDate(m.EndDate) + ")").join("\n");
 
         });
       }
