@@ -1,7 +1,7 @@
 console.log("JS loaded");
 
 // Create the map
-const MyMap = L.map('mapbox').setView([-15, -60], 3);
+const MyMap = L.map('mapbox').setView([-15, -60], 3.5);
 
 // Add tile layer
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
@@ -75,11 +75,23 @@ fetch("world.geojson")
       onEachFeature: function (feature, layer) {
 
         // Permanent name label
-        layer.bindTooltip(feature.properties.NAME, {
+        const name = feature.properties.NAME;
+
+        let labelLatLng = layer.getBounds().getCenter();
+
+        // Manual overrides
+        if (name === "Chile") {
+          labelLatLng = [-30, -71];   // Adjust to taste
+        }
+        if (name === "Argentina") {
+          labelLatLng = [-38, -64];
+        }
+
+        layer.bindTooltip(name, {
           permanent: true,
           direction: "center",
           className: "country-label"
-        });
+        }).setLatLng(labelLatLng);
 
         // Click behavior
         layer.on("click", function () {
