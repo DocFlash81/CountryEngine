@@ -8,24 +8,26 @@
   outline: none;
 }
 
-#info {
-  font-family: Consolas, "Courier New", monospace;
+/* Remove Leaflet tooltip box styling */
+.leaflet-tooltip.country-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  color: #111;
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  font-weight: bold;
 }
 
+/* Remove the little tooltip triangle */
+.leaflet-tooltip.country-label::before {
+  display: none;
+}
 
 #info {
   font-family: Consolas, "Courier New", monospace;
   font-size: 16px;
   line-height: 1.4;
   margin-bottom: 10px;
-}
-
-.country-label {
-  font-family: Consolas, monospace;
-  font-size: 14px;
-  font-weight: bold;
-  color: #111;
-  background: transparent;
-  border: none;
-  box-shadow: none;
 }
