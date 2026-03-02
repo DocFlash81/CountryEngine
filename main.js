@@ -71,7 +71,37 @@ fetch("SALite.csv")
       onEachFeature: function (feature, layer) {
         const name = feature.properties.NAME;
 
-        let labelLatLng = layer.getBounds().getCenter();
+        let labelLatLng;
+
+        const geom = feature.geometry;
+
+        if (geom.type === "MultiPolygon") {
+
+          // Find largest polygon by rough area (bounding box area)
+          let largest = null;
+          let largestArea = 0;
+
+          geom.coordinates.forEach(poly => {
+
+            const bounds = L.geoJSON({ type: "Polygon", coordinates: poly })
+              .getBounds();
+
+            const area =
+              Math.abs(bounds.getNorth() - bounds.getSouth()) *
+              Math.abs(bounds.getEast() - bounds.getWest());
+
+            if (area > largestArea) {
+              largestArea = area;
+              largest = bounds;
+            }
+          });
+
+          labelLatLng = largest.getCenter();
+
+        } else {
+
+          labelLatLng = layer.getBounds().getCenter();
+        }
 
         if (name === "Chile") labelLatLng = [-35, -71];
         if (name === "Argentina") labelLatLng = [-38, -64];
