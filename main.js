@@ -76,11 +76,15 @@ fetch("SALite.csv")
         if (name === "Chile") labelLatLng = [-30, -71];
         if (name === "Argentina") labelLatLng = [-38, -64];
 
-        layer.bindTooltip(name, {
+        const tooltip = L.tooltip({
           permanent: true,
           direction: "center",
           className: "country-label"
-        }).setLatLng(labelLatLng);
+        })
+          .setContent(name)
+          .setLatLng(labelLatLng);
+
+        layer.bindTooltip(tooltip);
 
         layer.on("click", function () {
 
