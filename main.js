@@ -36,7 +36,8 @@ fetch("SALite.csv")
         PolityID: cols[0].trim(),
         Name: cols[1].trim(),
         StartDate: cols[2].trim(),
-        EndDate: cols[3].trim()
+        EndDate: cols[3].trim(),
+        Color: cols[4].trim()
       };
     });
 
@@ -75,13 +76,27 @@ fetch("world.geojson")
 
           const countryName = feature.properties.NAME;
 
-          const matches = sovData
-            .filter(row => row.Name === countryName)
-            .sort((a, b) => a.StartDate.localeCompare(b.StartDate));
+          const matches = sovData.filter(row => row.Name === countryName);
 
-          document.getElementById("info").innerText =
-            matches.map(m => m.Name + "\u2014" + m.PolityID + " (" +
-              formatDate(m.StartDate) + "\u2014" + formatDate(m.EndDate) + ")").join("\n");
+          if (matches.length > 0) {
+
+            const regimeColor = matches[0].Color;
+
+            layer.setStyle({
+              fillColor: regimeColor,
+              fillOpacity: 0.6,
+              color: "#222",
+              weight: 2
+            });
+
+            document.getElementById("info").innerText =
+              matches.map(m =>
+                m.Name + " — " + m.PolityID + " (" +
+                formatDate(m.StartDate) + " — " +
+                formatDate(m.EndDate) + ")"
+              ).join("\n");
+
+          }
 
         });
       }
