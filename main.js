@@ -28,7 +28,7 @@ fetch("SALite.csv")
   .then(response => response.text())
   .then(text => {
 
-    const rows = text.split("\n").slice(1); // skip header
+    const rows = text.split("\n").slice(1);
 
     sovData = rows.map(row => {
       const cols = row.split(",");
@@ -43,15 +43,13 @@ fetch("SALite.csv")
 
     console.log("Sovereignty loaded:", sovData.length);
 
-  });
-
-// Load GeoJSON
-fetch("world.geojson")
+    // Now load GeoJSON AFTER sovereignty is ready
+    return fetch("world.geojson");
+  })
   .then(response => response.json())
   .then(data => {
 
     const southAmericaLayer = L.geoJSON(data, {
-
       filter: function (feature) {
         return feature.properties.CONTINENT === "South America";
       },
@@ -59,9 +57,7 @@ fetch("world.geojson")
       style: function (feature) {
 
         const countryName = feature.properties.NAME;
-
         const matches = sovData.filter(row => row.Name === countryName);
-
         const fill = matches.length > 0 ? matches[0].Color : "#cccccc";
 
         return {
@@ -73,19 +69,12 @@ fetch("world.geojson")
       },
 
       onEachFeature: function (feature, layer) {
-
-        // Permanent name label
         const name = feature.properties.NAME;
 
         let labelLatLng = layer.getBounds().getCenter();
 
-        // Manual overrides
-        if (name === "Chile") {
-          labelLatLng = [-30, -71];   // Adjust to taste
-        }
-        if (name === "Argentina") {
-          labelLatLng = [-38, -64];
-        }
+        if (name === "Chile") labelLatLng = [-30, -71];
+        if (name === "Argentina") labelLatLng = [-38, -64];
 
         layer.bindTooltip(name, {
           permanent: true,
@@ -93,35 +82,20 @@ fetch("world.geojson")
           className: "country-label"
         }).setLatLng(labelLatLng);
 
-        // Click behavior
         layer.on("click", function () {
 
-          const countryName = feature.properties.NAME;
+          const matches = sovData.filter(row => row.Name === name);
 
-          const matches = sovData.filter(row => row.Name === countryName);
-
-          if (matches.length > 0) {
-
-            const regimeColor = matches[0].Color;
-
-            layer.setStyle({
-              fillColor: regimeColor,
-              fillOpacity: 0.6,
-              color: "#222",
-              weight: 2
-            });
-
-            document.getElementById("info").innerText =
-              matches.map(m =>
-                m.Name + " — " + m.PolityID + " (" +
-                formatDate(m.StartDate) + " — " +
-                formatDate(m.EndDate) + ")"
-              ).join("\n");
-
-          }
+          document.getElementById("info").innerText =
+            matches.map(m =>
+              m.Name + " — " + m.PolityID + " (" +
+              formatDate(m.StartDate) + " — " +
+              formatDate(m.EndDate) + ")"
+            ).join("\n");
 
         });
       }
     });
+
     southAmericaLayer.addTo(MyMap);
   });
