@@ -74,8 +74,12 @@ fetch("world.geojson")
 
       onEachFeature: function (feature, layer) {
 
-        // Hover tooltip
-        
+        // Permanent name label
+        layer.bindTooltip(feature.properties.NAME, {
+          permanent: true,
+          direction: "center",
+          className: "country-label"
+        });
 
         // Click behavior
         layer.on("click", function () {

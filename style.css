@@ -19,3 +19,13 @@
   line-height: 1.4;
   margin-bottom: 10px;
 }
+
+.country-label {
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #111;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
