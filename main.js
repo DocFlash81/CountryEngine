@@ -4,8 +4,8 @@ console.log("JS loaded");
 const MyMap = L.map('mapbox').setView([-15, -60], 4);
 
 // Add tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
 }).addTo(MyMap);
 
 // Helper function for date presentation
@@ -78,7 +78,7 @@ fetch("world.geojson")
           const matches = sovData
             .filter(row => row.Name === countryName)
             .sort((a, b) => a.StartDate.localeCompare(b.StartDate));
-            
+
           document.getElementById("info").innerText =
             matches.map(m => m.Name + " - " + m.PolityID + " (" +
               formatDate(m.StartDate) + " - " + formatDate(m.EndDate) + ")").join("\n");
