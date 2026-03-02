@@ -1,7 +1,7 @@
 console.log("JS loaded");
 
 // Create the map
-const MyMap = L.map('mapbox').setView([-15, -60], 3.5);
+const MyMap = L.map('mapbox').setView([-15, -60], 4);
 
 // Add tile layer
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
