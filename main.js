@@ -56,20 +56,26 @@ fetch("world.geojson")
         return feature.properties.CONTINENT === "South America";
       },
 
-      style: function () {
+      style: function (feature) {
+
+        const countryName = feature.properties.NAME;
+
+        const matches = sovData.filter(row => row.Name === countryName);
+
+        const fill = matches.length > 0 ? matches[0].Color : "#cccccc";
+
         return {
-          color: "#0033cc",
-          weight: 2,
-          fillOpacity: 0.3
+          fillColor: fill,
+          fillOpacity: 0.5,
+          color: "#222",
+          weight: 1.5
         };
       },
 
       onEachFeature: function (feature, layer) {
 
         // Hover tooltip
-        layer.bindTooltip(feature.properties.NAME, {
-          sticky: true
-        });
+        
 
         // Click behavior
         layer.on("click", function () {
