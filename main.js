@@ -71,7 +71,7 @@ fetch("SALite.csv")
       onEachFeature: function (feature, layer) {
         const name = feature.properties.NAME;
 
-        let labelLatLng = layer.getBounds().getCenter();
+        let labelLatLng = layer.getCenter();
 
         if (name === "Chile") labelLatLng = [-30, -71];
         if (name === "Argentina") labelLatLng = [-38, -64];
