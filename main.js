@@ -82,7 +82,8 @@ fetch("SALite.csv")
           icon: L.divIcon({
             className: "country-label",
             html: name,
-            iconSize: [0, 0]
+            iconSize: [100, 40],      // give it real size
+            iconAnchor: [50, 20]      // center anchor
           }),
           interactive: false
         }).addTo(MyMap);

@@ -31,3 +31,11 @@
   line-height: 1.4;
   margin-bottom: 10px;
 }
+
+.country-label {
+  font-family: Consolas, monospace;
+  font-size: 22px;
+  font-weight: bold;
+  color: #111;
+  text-align: center;
+}
