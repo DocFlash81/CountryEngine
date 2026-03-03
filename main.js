@@ -22,6 +22,18 @@ function formatDate(yyyymmdd) {
   return `${year} ${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
 }
 
+
+
+
+const capitalIcon = L.divIcon({
+  className: "capital-icon",
+  html: "★",
+  iconSize: [18, 18],
+  iconAnchor: [9, 9]
+});
+
+
+
 // Load sovereignty data
 let sovData = [];
 fetch("SALite.csv")
@@ -40,6 +52,37 @@ fetch("SALite.csv")
         Color: cols[4].trim()
       };
     });
+
+    let capitalData = [];
+    let capitalLayer = L.layerGroup().addTo(MyMap);
+
+    return fetch("SACaps.csv")
+      .then(response => response.text())
+      .then(text => {
+
+        const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
+
+        capitalData = rows.map(row => {
+          const cols = row.split(",");
+          return {
+            ID: cols[0].trim(),
+            Begin: cols[1].trim(),
+            End: cols[2].trim(),
+            Capital: cols[3].trim(),
+            Lat: parseFloat(cols[4]),
+            Lon: parseFloat(cols[5])
+          };
+        });
+
+        console.log("Capitals loaded:", capitalData.length);
+
+        return fetch("world.geojson");
+      });
+
+
+
+
+
 
     console.log("Sovereignty loaded:", sovData.length);
 
@@ -105,3 +148,23 @@ fetch("SALite.csv")
 
     southAmericaLayer.addTo(MyMap);
   });
+
+MyMap.on("zoomend", updateCapitals);
+updateCapitals();
+
+function updateCapitals() {
+
+  capitalLayer.clearLayers();
+
+  if (MyMap.getZoom() < 5) return;
+
+  capitalData.forEach(row => {
+
+    const marker = L.marker([row.Lat, row.Lon], {
+      icon: capitalIcon,
+      interactive: false
+    });
+
+    marker.addTo(capitalLayer);
+  });
+}
