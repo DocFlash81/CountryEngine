@@ -71,50 +71,21 @@ fetch("SALite.csv")
       onEachFeature: function (feature, layer) {
         const name = feature.properties.NAME;
 
-        let labelLatLng;
+        // compute position
+        let labelLatLng = layer.getBounds().getCenter();
 
-        const geom = feature.geometry;
+        // you can still override manually if desired
+        if (name === "Chile") labelLatLng = [-33, -71];
+        if (name === "Argentina") labelLatLng = [-38, -63];
 
-        if (geom.type === "MultiPolygon") {
-
-          // Find largest polygon by rough area (bounding box area)
-          let largest = null;
-          let largestArea = 0;
-
-          geom.coordinates.forEach(poly => {
-
-            const bounds = L.geoJSON({ type: "Polygon", coordinates: poly })
-              .getBounds();
-
-            const area =
-              Math.abs(bounds.getNorth() - bounds.getSouth()) *
-              Math.abs(bounds.getEast() - bounds.getWest());
-
-            if (area > largestArea) {
-              largestArea = area;
-              largest = bounds;
-            }
-          });
-
-          labelLatLng = largest.getCenter();
-
-        } else {
-
-          labelLatLng = layer.getBounds().getCenter();
-        }
-
-        if (name === "Chile") labelLatLng = [-35, -71];
-        if (name === "Argentina") labelLatLng = [-38, -64];
-
-        const tooltip = L.tooltip({
-          permanent: true,
-          direction: "center",
-          className: "country-label"
-        })
-          .setContent(name)
-          .setLatLng(labelLatLng);
-
-        layer.bindTooltip(tooltip);
+        L.marker(labelLatLng, {
+          icon: L.divIcon({
+            className: "country-label",
+            html: name,
+            iconSize: [0, 0]
+          }),
+          interactive: false
+        }).addTo(MyMap);
 
         layer.on("click", function () {
 
