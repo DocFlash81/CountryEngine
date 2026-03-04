@@ -32,10 +32,11 @@ const capitalIcon = L.divIcon({
   iconAnchor: [9, 9]
 });
 
-
+let sovData = [];
+let capitalData = [];
+let capitalLayer = L.layerGroup().addTo(MyMap);
 
 // Load sovereignty data
-let sovData = [];
 fetch("SALite.csv")
   .then(response => response.text())
   .then(text => {
@@ -52,9 +53,6 @@ fetch("SALite.csv")
         Color: cols[4].trim()
       };
     });
-
-    let capitalData = [];
-    let capitalLayer = L.layerGroup().addTo(MyMap);
 
     return fetch("SACaps.csv")
       .then(response => response.text())
@@ -80,14 +78,8 @@ fetch("SALite.csv")
       });
 
 
-
-
-
-
     console.log("Sovereignty loaded:", sovData.length);
 
-    // Now load GeoJSON AFTER sovereignty is ready
-    return fetch("world.geojson");
   })
   .then(response => response.json())
   .then(data => {
