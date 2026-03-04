@@ -152,6 +152,11 @@ function updateCapitals() {
 
   capitalData.forEach(row => {
 
+    // Only show if the polity exists in our sovereignty table
+    const exists = sovData.some(s => s.PolityID === row.ID);
+
+    if (!exists) return;
+
     const marker = L.marker([row.Lat, row.Lon], {
       icon: capitalIcon,
       interactive: false
