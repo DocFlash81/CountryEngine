@@ -74,7 +74,7 @@ fetch("SALite.csv")
 
         console.log("Capitals loaded:", capitalData.length);
 
-        return fetch("world50.geojson");
+        return fetch("world10.geojson");
       });
 
 
