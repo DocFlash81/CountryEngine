@@ -22,9 +22,6 @@ function formatDate(yyyymmdd) {
   return `${year} ${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
 }
 
-
-
-
 const capitalIcon = L.divIcon({
   className: "capital-icon",
   html: "★",
@@ -74,7 +71,7 @@ fetch("SALite.csv")
 
         console.log("Capitals loaded:", capitalData.length);
 
-        return fetch("world10.geojson");
+        return fetch("world50.geojson");
       });
 
 
