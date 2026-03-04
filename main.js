@@ -84,7 +84,7 @@ fetch("SALite.csv")
   .then(response => response.json())
   .then(data => {
 
-    const southAmericaLayer = L.geoJSON(data, {
+    southAmericaLayer = L.geoJSON(data, {
       filter: function (feature) {
         return feature.properties.CONTINENT === "South America";
       },
@@ -191,6 +191,8 @@ function updateCapitals() {
 
 function updateMapByYear() {
 
+  if (!southAmericaLayer) return;
+  
   southAmericaLayer.eachLayer(function (layer) {
 
     const name = layer.feature.properties.NAME;
