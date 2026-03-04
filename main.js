@@ -148,20 +148,37 @@ function updateCapitals() {
 
   capitalLayer.clearLayers();
 
-  if (MyMap.getZoom() < 5) return;
+  const zoom = MyMap.getZoom();
+  if (zoom < 5) return;
 
   capitalData.forEach(row => {
 
-    // Only show if the polity exists in our sovereignty table
     const exists = sovData.some(s => s.PolityID === row.ID);
-
     if (!exists) return;
 
-    const marker = L.marker([row.Lat, row.Lon], {
+    // STAR
+    const star = L.marker([row.Lat, row.Lon], {
       icon: capitalIcon,
       interactive: false
     });
 
-    marker.addTo(capitalLayer);
+    star.addTo(capitalLayer);
+
+    // NAME (only at higher zoom)
+    if (zoom >= 6) {
+
+      const label = L.marker([row.Lat, row.Lon], {
+        icon: L.divIcon({
+          className: "capital-label",
+          html: row.Capital,
+          iconSize: [120, 20],
+          iconAnchor: [60, -10]
+        }),
+        interactive: false
+      });
+
+      label.addTo(capitalLayer);
+    }
+
   });
 }

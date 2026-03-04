@@ -45,3 +45,11 @@
   font-size: 18px;
   text-align: center;
 }
+
+.capital-label {
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+}
