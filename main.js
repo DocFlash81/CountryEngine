@@ -146,6 +146,8 @@ updateCapitals();
 
 function updateCapitals() {
 
+  if (!southAmericaLayer) return;
+
   capitalLayer.clearLayers();
 
   const zoom = MyMap.getZoom();
@@ -228,6 +230,6 @@ slider.addEventListener("input", function () {
   display.innerText = selectedYear;
 
   console.log("Slider moved:", selectedYear);
-  
+
   updateMapByYear();
 });
