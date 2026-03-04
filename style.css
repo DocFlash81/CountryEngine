@@ -53,3 +53,9 @@
   color: black;
   text-align: center;
 }
+
+#controls {
+  margin: 10px 0;
+  font-family: Consolas, monospace;
+  font-size: 18px;
+}

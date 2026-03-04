@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Country Engine</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
+
 <body>
 
   <h1>Country Engine</h1>
-  
+
+  <div id="controls">
+    <input type="range" id="yearSlider" min="1500" max="2026" step="1" value="1815">
+    <span id="yearDisplay">1815</span>
+  </div>
+
   <div id="info"></div>
 
   <div id="mapbox"></div>
@@ -17,4 +24,5 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="main.js"></script>
 </body>
+
 </html>

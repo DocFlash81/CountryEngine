@@ -1,5 +1,8 @@
 console.log("JS loaded");
 
+let selectedYear = 1815;
+let southAmericaLayer;
+
 // Create the map
 const MyMap = L.map('mapbox').setView([-15, -60], 4);
 
@@ -150,7 +153,11 @@ function updateCapitals() {
 
   capitalData.forEach(row => {
 
-    const exists = sovData.some(s => s.PolityID === row.ID);
+    const exists = sovData.some(s =>
+      s.PolityID === row.ID &&
+      parseInt(s.StartDate.substring(0, 4)) <= selectedYear &&
+      parseInt(s.EndDate.substring(0, 4)) >= selectedYear
+    );
     if (!exists) return;
 
     // STAR
@@ -179,3 +186,46 @@ function updateCapitals() {
 
   });
 }
+
+function updateMapByYear() {
+
+  southAmericaLayer.eachLayer(function (layer) {
+
+    const name = layer.feature.properties.NAME;
+
+    const match = sovData.find(row =>
+      row.Name === name &&
+      parseInt(row.StartDate.substring(0, 4)) <= selectedYear &&
+      parseInt(row.EndDate.substring(0, 4)) >= selectedYear
+    );
+
+    if (match) {
+
+      layer.setStyle({
+        fillColor: match.Color,
+        fillOpacity: 0.5
+      });
+
+    } else {
+
+      layer.setStyle({
+        fillColor: "#cccccc",
+        fillOpacity: 0.2
+      });
+    }
+
+  });
+
+  updateCapitals();
+}
+
+const slider = document.getElementById("yearSlider");
+const display = document.getElementById("yearDisplay");
+
+slider.addEventListener("input", function () {
+
+  selectedYear = parseInt(this.value);
+  display.innerText = selectedYear;
+
+  updateMapByYear();
+});
