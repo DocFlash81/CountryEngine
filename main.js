@@ -227,5 +227,7 @@ slider.addEventListener("input", function () {
   selectedYear = parseInt(this.value);
   display.innerText = selectedYear;
 
+  console.log("Slider moved:", selectedYear);
+  
   updateMapByYear();
 });
