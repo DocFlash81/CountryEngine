@@ -211,7 +211,7 @@ async function updateMapByYear() {
         weight: 1.5
       };
     }
-  }).addTo(lableLayer);
+  }).addTo(labelLayer);
 
   updateCapitals();
 }
