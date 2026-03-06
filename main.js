@@ -98,7 +98,12 @@ fetch("SALite.csv")
 
         console.log("Capitals loaded:", capitalData.length);
 
-        updateMapByYear();
+        uPromise.all([
+          fetch("SAgeo.csv").then(r => r.text()),
+          fetch("SALite.csv").then(r => r.text())
+        ]).then(() => {
+          updateMapByYear();
+        });
       });
   })
 
