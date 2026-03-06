@@ -163,6 +163,12 @@ async function updateMapByYear() {
 
   labelLayer.clearLayers();
 
+  // wipe frame clean
+  L.rectangle(
+    [[-90, -180], [90, 180]],
+    { color: null, fillColor: "#ffffff", fillOpacity: 1 }
+  ).addTo(MyMap);
+
   if (southAmericaLayer) {
     MyMap.removeLayer(southAmericaLayer);
   }
