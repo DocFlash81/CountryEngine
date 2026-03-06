@@ -97,78 +97,12 @@ fetch("SALite.csv")
 
         console.log("Capitals loaded:", capitalData.length);
 
-        return fetch("world50.geojson");
       });
 
 
     console.log("Sovereignty loaded:", sovData.length);
 
   })
-  .then(response => response.json())
-  .then(data => {
-
-    southAmericaLayer = L.geoJSON(data, {
-      filter: function (feature) {
-        return feature.properties.CONTINENT === "South America";
-      },
-
-      style: function (feature) {
-
-        const countryName = feature.properties.NAME;
-        const matches = sovData.filter(row => row.Name === countryName);
-        const fill = matches.length > 0 ? matches[0].Color : "#cccccc";
-
-        return {
-          fillColor: fill,
-          fillOpacity: 0.5,
-          color: "#222",
-          weight: 1.5
-        };
-      },
-
-      oonEachFeature: function (feature, layer) {
-
-        const y = selectedYear * 10000;
-
-        const matchGeo = activeGeo.find(g => g.File === feature.properties.TAFile);
-        if (!matchGeo) return;
-
-        const polityID = matchGeo.ID;
-
-        const polity = activePolities.find(p => p.PolityID === polityID);
-
-        const nameObj = getNameForYear(polityID, y);
-        const labelText = nameObj ? nameObj.Display : polityID;
-
-        // compute position
-        let labelLatLng = layer.getBounds().getCenter();
-
-        L.marker(labelLatLng, {
-          icon: L.divIcon({
-            className: "country-label",
-            html: labelText,
-            iconSize: [100, 40],
-            iconAnchor: [50, 20]
-          }),
-          interactive: false
-        }).addTo(MyMap);
-
-        layer.on("click", function () {
-
-          document.getElementById("info").innerText =
-            `${labelText}
-${nameObj?.Official || ""}
-
-${polityID}
-${formatDate(polity.StartDate)} — ${formatDate(polity.EndDate)}`;
-
-        });
-
-      }
-    });
-
-    southAmericaLayer.addTo(MyMap);
-  });
 
 MyMap.on("zoomend", updateCapitals);
 updateCapitals();
@@ -261,7 +195,6 @@ async function updateMapByYear() {
 
     style: function (feature) {
 
-      console.log("feature:", feature.properties.name);
 
       // determine which polity owns this geometry
       const matchGeo = activeGeo.find(g => g.File === feature.properties.TAFile);
@@ -296,3 +229,5 @@ slider.addEventListener("input", function () {
 
   updateMapByYear();
 });
+
+updateMapByYear();
