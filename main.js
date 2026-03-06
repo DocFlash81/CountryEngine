@@ -32,6 +32,29 @@ const capitalIcon = L.divIcon({
   iconAnchor: [9, 9]
 });
 
+
+let geoData = [];
+
+fetch("SAgeo.csv")
+  .then(r => r.text())
+  .then(text => {
+
+    const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
+
+    geoData = rows.map(row => {
+      const c = row.split(",");
+      return {
+        ID: c[0].trim(),
+        Begin: parseInt(c[1]),
+        End: parseInt(c[2]),
+        File: c[3].trim()
+      };
+    });
+
+    console.log("TA geometry rows loaded:", geoData.length);
+  });
+
+
 let sovData = [];
 let capitalData = [];
 let capitalLayer = L.layerGroup().addTo(MyMap);
@@ -109,10 +132,6 @@ fetch("SALite.csv")
         // compute position
         let labelLatLng = layer.getBounds().getCenter();
 
-        // you can still override manually if desired
-        if (name === "Chile") labelLatLng = [-33, -71];
-        if (name === "Argentina") labelLatLng = [-38, -63];
-
         L.marker(labelLatLng, {
           icon: L.divIcon({
             className: "country-label",
@@ -189,36 +208,58 @@ function updateCapitals() {
   });
 }
 
-function updateMapByYear() {
+async function updateMapByYear() {
 
-  if (!southAmericaLayer) return;
-  
-  southAmericaLayer.eachLayer(function (layer) {
+  if (southAmericaLayer) {
+    MyMap.removeLayer(southAmericaLayer);
+  }
 
-    const name = layer.feature.properties.NAME;
+  const y = selectedYear * 10000;
 
-    const match = sovData.find(row =>
-      row.Name === name &&
-      parseInt(row.StartDate.substring(0, 4)) <= selectedYear &&
-      parseInt(row.EndDate.substring(0, 4)) >= selectedYear
-    );
+  // STEP 1 — active polities
+  const activePolities = sovData.filter(p =>
+    parseInt(p.StartDate) <= y &&
+    parseInt(p.EndDate) >= y
+  );
 
-    if (match) {
+  // STEP 2 — active geometry rows for those polities
+  const activeGeo = geoData.filter(g =>
+    activePolities.some(p => p.PolityID === g.ID) &&
+    g.Begin <= y &&
+    g.End >= y
+  );
 
-      layer.setStyle({
-        fillColor: match.Color,
-        fillOpacity: 0.5
-      });
+  // STEP 3 — unique files needed
+  const filesNeeded = [...new Set(activeGeo.map(g => g.File))];
 
-    } else {
+  // STEP 4 — load them
+  const layers = await Promise.all(
+    filesNeeded.map(f =>
+      fetch(`geojson/${f}.geojson`).then(r => r.json())
+    )
+  );
 
-      layer.setStyle({
-        fillColor: "#cccccc",
-        fillOpacity: 0.2
-      });
+  // STEP 5 — build map layer
+  southAmericaLayer = L.geoJSON(layers.flat(), {
+    style: function(feature) {
+
+      // determine which polity owns this geometry
+      const matchGeo = activeGeo.find(g => g.File === feature.properties.name);
+
+      if (!matchGeo) {
+        return { fillColor: "#ccc", fillOpacity: 0.2, color: "#222", weight: 1 };
+      }
+
+      const polity = activePolities.find(p => p.PolityID === matchGeo.ID);
+
+      return {
+        fillColor: polity?.Color || "#ccc",
+        fillOpacity: 0.5,
+        color: "#222",
+        weight: 1.5
+      };
     }
-
-  });
+  }).addTo(MyMap);
 
   updateCapitals();
 }
