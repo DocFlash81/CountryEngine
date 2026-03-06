@@ -174,6 +174,8 @@ async function updateMapByYear() {
     parseInt(p.EndDate) >= y
   );
 
+  console.log("ACTIVE POLITIES:", activePolities.map(p => p.PolityID));
+  
   // STEP 2 — active geometry rows for those polities
   const activeGeo = geoData.filter(g =>
     activePolities.some(p => p.PolityID === g.ID) &&
