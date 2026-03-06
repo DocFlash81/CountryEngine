@@ -175,7 +175,7 @@ async function updateMapByYear() {
   );
 
   console.log("ACTIVE POLITIES:", activePolities.map(p => p.PolityID));
-  
+
   // STEP 2 — active geometry rows for those polities
   const activeGeo = geoData.filter(g =>
     activePolities.some(p => p.PolityID === g.ID) &&
@@ -223,7 +223,7 @@ async function updateMapByYear() {
         weight: 1.5
       };
     }
-  }).addTo(labelLayer);
+  }).addTo(MyMap);
 
   updateCapitals();
 }
