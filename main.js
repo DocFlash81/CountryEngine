@@ -1,6 +1,6 @@
 console.log("JS loaded");
 
-let selectedYear = 1815;
+let selectedYear = 2026;
 let southAmericaLayer;
 
 // Create the map
@@ -126,8 +126,19 @@ fetch("SALite.csv")
         };
       },
 
-      onEachFeature: function (feature, layer) {
-        const name = feature.properties.NAME;
+      oonEachFeature: function (feature, layer) {
+
+        const y = selectedYear * 10000;
+
+        const matchGeo = activeGeo.find(g => g.File === feature.properties.TAFile);
+        if (!matchGeo) return;
+
+        const polityID = matchGeo.ID;
+
+        const polity = activePolities.find(p => p.PolityID === polityID);
+
+        const nameObj = getNameForYear(polityID, y);
+        const labelText = nameObj ? nameObj.Display : polityID;
 
         // compute position
         let labelLatLng = layer.getBounds().getCenter();
@@ -135,25 +146,24 @@ fetch("SALite.csv")
         L.marker(labelLatLng, {
           icon: L.divIcon({
             className: "country-label",
-            html: name,
-            iconSize: [100, 40],      // give it real size
-            iconAnchor: [50, 20]      // center anchor
+            html: labelText,
+            iconSize: [100, 40],
+            iconAnchor: [50, 20]
           }),
           interactive: false
         }).addTo(MyMap);
 
         layer.on("click", function () {
 
-          const matches = sovData.filter(row => row.Name === name);
-
           document.getElementById("info").innerText =
-            matches.map(m =>
-              m.Name + " — " + m.PolityID + " (" +
-              formatDate(m.StartDate) + " — " +
-              formatDate(m.EndDate) + ")"
-            ).join("\n");
+            `${labelText}
+${nameObj?.Official || ""}
+
+${polityID}
+${formatDate(polity.StartDate)} — ${formatDate(polity.EndDate)}`;
 
         });
+
       }
     });
 
@@ -248,7 +258,7 @@ async function updateMapByYear() {
 
   // STEP 5 — build map layer
   southAmericaLayer = L.geoJSON(layers.flat(), {
-    
+
     style: function (feature) {
 
       console.log("feature:", feature.properties.name);
