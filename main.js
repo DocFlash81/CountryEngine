@@ -225,6 +225,34 @@ async function updateMapByYear() {
     }
   }).addTo(MyMap);
 
+  // STEP 6 — draw polity names
+
+  labelLayer.clearLayers();
+
+  activeGeo.forEach(g => {
+
+    const polity = activePolities.find(p => p.PolityID === g.ID);
+    if (!polity) return;
+
+    // find matching geojson layer we just loaded
+    const geoLayer = L.geoJSON(
+      layers.find(l => l.features[0].properties.TAFile === g.File)
+    );
+
+    const center = geoLayer.getBounds().getCenter();
+
+    L.marker(center, {
+      icon: L.divIcon({
+        className: "country-label",
+        html: polity.Name,
+        iconSize: [100, 40],
+        iconAnchor: [50, 20]
+      }),
+      interactive: false
+    }).addTo(labelLayer);
+
+  });
+
   updateCapitals();
 }
 
