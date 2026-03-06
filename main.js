@@ -243,6 +243,8 @@ async function updateMapByYear() {
   southAmericaLayer = L.geoJSON(layers.flat(), {
     style: function(feature) {
 
+      console.log("feature:", feature.properties.name);
+      
       // determine which polity owns this geometry
       const matchGeo = activeGeo.find(g => g.File === feature.properties.name);
 
