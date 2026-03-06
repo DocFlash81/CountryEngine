@@ -5,26 +5,26 @@ let southAmericaLayer;
 
 // Create the map
 const MyMap = L.map('mapbox').setView([-15, -60], 4);
-
-// Add tile layer
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
 }).addTo(MyMap);
+
+// need a labelLayer
+let labelLayer = L.layerGroup().addTo(MyMap);
 
 // Helper function for date presentation
 function formatDate(yyyymmdd) {
   const year = yyyymmdd.substring(0, 4);
   const month = yyyymmdd.substring(4, 6);
   const day = yyyymmdd.substring(6, 8);
-
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
-
   return `${year} ${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
 }
 
+// Star for capitals
 const capitalIcon = L.divIcon({
   className: "capital-icon",
   html: "★",
@@ -32,15 +32,13 @@ const capitalIcon = L.divIcon({
   iconAnchor: [9, 9]
 });
 
-
+// load geojson dataset
 let geoData = [];
-
 fetch("SAgeo.csv")
   .then(r => r.text())
   .then(text => {
 
     const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
-
     geoData = rows.map(row => {
       const c = row.split(",");
       return {
@@ -59,7 +57,7 @@ let sovData = [];
 let capitalData = [];
 let capitalLayer = L.layerGroup().addTo(MyMap);
 
-// Load sovereignty data
+// Load sovereignty data and capitals data
 fetch("SALite.csv")
   .then(response => response.text())
   .then(text => {
@@ -75,6 +73,7 @@ fetch("SALite.csv")
         EndDate: cols[3].trim(),
         Color: cols[4].trim()
       };
+      console.log("Sovereignty loaded:", sovData.length);
     });
 
     return fetch("SACaps.csv")
@@ -98,26 +97,18 @@ fetch("SALite.csv")
         console.log("Capitals loaded:", capitalData.length);
 
       });
-
-
-    console.log("Sovereignty loaded:", sovData.length);
-
   })
 
 MyMap.on("zoomend", updateCapitals);
 updateCapitals();
 
+// put capitals on map
 function updateCapitals() {
-
   if (!southAmericaLayer) return;
-
   capitalLayer.clearLayers();
-
   const zoom = MyMap.getZoom();
   if (zoom < 5) return;
-
   capitalData.forEach(row => {
-
     const exists = sovData.some(s =>
       s.PolityID === row.ID &&
       parseInt(s.StartDate.substring(0, 4)) <= selectedYear &&
@@ -148,16 +139,17 @@ function updateCapitals() {
 
       label.addTo(capitalLayer);
     }
-
   });
 }
 
+// updateMapByYear updates the map given the slider year
 async function updateMapByYear() {
+
+  labelLayer.clearLayers();
 
   if (southAmericaLayer) {
     MyMap.removeLayer(southAmericaLayer);
   }
-
   const y = selectedYear * 10000;
 
   // STEP 1 — active polities
@@ -195,7 +187,6 @@ async function updateMapByYear() {
 
     style: function (feature) {
 
-
       // determine which polity owns this geometry
       const matchGeo = activeGeo.find(g => g.File === feature.properties.TAFile);
 
@@ -212,7 +203,7 @@ async function updateMapByYear() {
         weight: 1.5
       };
     }
-  }).addTo(MyMap);
+  }).addTo(lableLayer);
 
   updateCapitals();
 }
