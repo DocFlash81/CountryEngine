@@ -212,6 +212,8 @@ async function updateMapByYear() {
 
       const polity = activePolities.find(p => p.PolityID === matchGeo.ID);
 
+      console.log("COLOR DEBUG:", feature.properties.TAFile, matchGeo?.ID);
+
       return {
         fillColor: polity?.Color || "#ccc",
         fillOpacity: 0.5,
