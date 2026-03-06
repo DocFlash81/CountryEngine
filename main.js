@@ -235,7 +235,7 @@ async function updateMapByYear() {
   // STEP 4 — load them
   const layers = await Promise.all(
     filesNeeded.map(f =>
-      fetch(`geojson/${f}.geojson`).then(r => r.json())
+      fetch(`Geojson/${f}.geojson`).then(r => r.json())
     )
   );
 
