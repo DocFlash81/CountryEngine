@@ -124,11 +124,9 @@ function updateCapitals() {
 
   capitalData.forEach(row => {
 
-    const exists = sovData.some(s =>
-      s.PolityID === row.ID &&
-      parseInt(s.StartDate) <= y &&
-      parseInt(s.EndDate) >= y
-    );
+    const exists =
+      parseInt(row.Begin) <= y &&
+      parseInt(row.End) >= y;
 
     if (!exists) return;
 
