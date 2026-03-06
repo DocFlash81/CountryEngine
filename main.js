@@ -119,35 +119,36 @@ function updateCapitals() {
   capitalData.forEach(row => {
     const exists = sovData.some(s =>
       s.PolityID === row.ID &&
-      parseInt(s.StartDate.substring(0, 4)) <= selectedYear &&
-      parseInt(s.EndDate.substring(0, 4)) >= selectedYear
+      const y = selectedYear * 10000;
+    parseInt(s.StartDate) <= y &&
+      parseInt(s.EndDate) >= y
     );
-    if (!exists) return;
+  if (!exists) return;
 
-    // STAR
-    const star = L.marker([row.Lat, row.Lon], {
-      icon: capitalIcon,
+  // STAR
+  const star = L.marker([row.Lat, row.Lon], {
+    icon: capitalIcon,
+    interactive: false
+  });
+
+  star.addTo(capitalLayer);
+
+  // NAME (only at higher zoom)
+  if (zoom >= 6) {
+
+    const label = L.marker([row.Lat, row.Lon], {
+      icon: L.divIcon({
+        className: "capital-label",
+        html: row.Capital,
+        iconSize: [120, 20],
+        iconAnchor: [60, -10]
+      }),
       interactive: false
     });
 
-    star.addTo(capitalLayer);
-
-    // NAME (only at higher zoom)
-    if (zoom >= 6) {
-
-      const label = L.marker([row.Lat, row.Lon], {
-        icon: L.divIcon({
-          className: "capital-label",
-          html: row.Capital,
-          iconSize: [120, 20],
-          iconAnchor: [60, -10]
-        }),
-        interactive: false
-      });
-
-      label.addTo(capitalLayer);
-    }
-  });
+    label.addTo(capitalLayer);
+  }
+});
 }
 
 // updateMapByYear updates the map given the slider year
