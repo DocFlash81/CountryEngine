@@ -98,7 +98,7 @@ fetch("SALite.csv")
 
         console.log("Capitals loaded:", capitalData.length);
 
-        uPromise.all([
+        Promise.all([
           fetch("SAgeo.csv").then(r => r.text()),
           fetch("SALite.csv").then(r => r.text())
         ]).then(() => {
