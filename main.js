@@ -235,18 +235,26 @@ async function updateMapByYear() {
   // STEP 4 — load them
   const layers = await Promise.all(
     filesNeeded.map(f =>
-      fetch(`Geojson/${f}.geojson`).then(r => r.json())
+      fetch(`Geojson/${f}.geojson`)
+        .then(r => r.json())
+        .then(data => {
+          data.features.forEach(feat => {
+            feat.properties.TAFile = f;
+          });
+          return data;
+        })
     )
   );
 
   // STEP 5 — build map layer
   southAmericaLayer = L.geoJSON(layers.flat(), {
-    style: function(feature) {
+    
+    style: function (feature) {
 
       console.log("feature:", feature.properties.name);
-      
+
       // determine which polity owns this geometry
-      const matchGeo = activeGeo.find(g => g.File === feature.properties.name);
+      const matchGeo = activeGeo.find(g => g.File === feature.properties.TAFile);
 
       if (!matchGeo) {
         return { fillColor: "#ccc", fillOpacity: 0.2, color: "#222", weight: 1 };
