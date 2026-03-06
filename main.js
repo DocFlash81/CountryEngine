@@ -73,8 +73,10 @@ fetch("SALite.csv")
         EndDate: cols[3].trim(),
         Color: cols[4].trim()
       };
-      console.log("Sovereignty loaded:", sovData.length);
+
     });
+
+    console.log("Sovereignty loaded:", sovData.length);
 
     return fetch("SACaps.csv")
       .then(response => response.text())
@@ -96,6 +98,7 @@ fetch("SALite.csv")
 
         console.log("Capitals loaded:", capitalData.length);
 
+        updateMapByYear();
       });
   })
 
@@ -220,5 +223,3 @@ slider.addEventListener("input", function () {
 
   updateMapByYear();
 });
-
-updateMapByYear();
