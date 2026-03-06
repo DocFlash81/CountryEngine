@@ -112,43 +112,52 @@ updateCapitals();
 
 // put capitals on map
 function updateCapitals() {
+
   if (!southAmericaLayer) return;
+
   capitalLayer.clearLayers();
+
   const zoom = MyMap.getZoom();
   if (zoom < 5) return;
+
+  const y = selectedYear * 10000;   // ✅ MOVE HERE
+
   capitalData.forEach(row => {
+
     const exists = sovData.some(s =>
       s.PolityID === row.ID &&
-      const y = selectedYear * 10000;
-    parseInt(s.StartDate) <= y &&
+      parseInt(s.StartDate) <= y &&
       parseInt(s.EndDate) >= y
     );
-  if (!exists) return;
 
-  // STAR
-  const star = L.marker([row.Lat, row.Lon], {
-    icon: capitalIcon,
-    interactive: false
-  });
+    if (!exists) return;
 
-  star.addTo(capitalLayer);
-
-  // NAME (only at higher zoom)
-  if (zoom >= 6) {
-
-    const label = L.marker([row.Lat, row.Lon], {
-      icon: L.divIcon({
-        className: "capital-label",
-        html: row.Capital,
-        iconSize: [120, 20],
-        iconAnchor: [60, -10]
-      }),
+    // STAR
+    const star = L.marker([row.Lat, row.Lon], {
+      icon: capitalIcon,
       interactive: false
     });
 
-    label.addTo(capitalLayer);
-  }
-});
+    star.addTo(capitalLayer);
+
+    // NAME (only at higher zoom)
+    if (zoom >= 6) {
+
+      const label = L.marker([row.Lat, row.Lon], {
+        icon: L.divIcon({
+          className: "capital-label",
+          html: row.Capital,
+          iconSize: [120, 20],
+          iconAnchor: [60, -10]
+        }),
+        interactive: false
+      });
+
+      label.addTo(capitalLayer);
+    }
+
+  });
+
 }
 
 // updateMapByYear updates the map given the slider year
