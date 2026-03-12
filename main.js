@@ -2,6 +2,7 @@ console.log("JS loaded");
 
 let selectedDate = 20260101;
 let worldLayer = null;
+let renderVersion = 0;
 
 const slider = document.getElementById("yearSlider");
 const display = document.getElementById("yearDisplay");
