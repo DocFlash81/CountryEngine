@@ -1,6 +1,7 @@
 console.log( "JS loaded" );
 
 let selectedDate      = 20260101;
+let southAmericaLayer = null;
 let worldLayer = null;
 
 const slider    = document.getElementById( "yearSlider" );
@@ -26,6 +27,7 @@ function formatDate( yyyymmdd ) {
 }
 
 function monthIndexToDate( idx ) {
+  const startYear = 1800;
   const startYear = 1700;
   const year  = startYear + Math.floor( idx / 12 );
   const month = ( idx % 12 ) + 1;
@@ -99,119 +101,115 @@ const capitalIcon = L.divIcon( {
 let geoData     = [];
 let sovData     = [];
 let capitalData = [];
-let capitalLayer = L.layerGroup().addTo(MyMap);
 
-// Load sovereignty data
-fetch("SALite.csv")
-  .then(response => response.text())
-  .then(text => {
+// -------------------------
+// CSV parsing helpers
+// -------------------------
 
-    const rows = text.split("\n").slice(1);
+function parseGeoCSV( text ) {
+  const rows = text.split( "\n" ).slice( 1 ).filter( r => r.trim() !== "" );
 
-    sovData = rows.map(row => {
-      const cols = row.split(",");
-      return {
-        PolityID: cols[0].trim(),
-        Name: cols[1].trim(),
-        StartDate: cols[2].trim(),
-        EndDate: cols[3].trim(),
-        Color: cols[4].trim()
-      };
-    });
+  return rows.map( row => {
+    const c = row.split( "," );
+    return {
+      ID:    c[ 0 ].trim(),
+      Begin: parseInt( c[ 1 ], 10 ),
+      End:   parseInt( c[ 2 ], 10 ),
+      File:  c[ 3 ].trim()
+    };
+  } );
+}
 
-    return fetch("SACaps.csv")
-      .then(response => response.text())
-      .then(text => {
+function parseSovCSV( text ) {
+  const rows = text.split( "\n" ).slice( 1 ).filter( r => r.trim() !== "" );
 
-        const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
+  return rows.map( row => {
+    const cols = row.split( "," );
+    return {
+      PolityID:  cols[ 0 ].trim(),
+      Name:      cols[ 1 ].trim(),
+      StartDate: parseInt( cols[ 2 ], 10 ),
+      EndDate:   parseInt( cols[ 3 ], 10 ),
+      Color:     cols[ 4 ].trim()
+    };
+  } );
+}
 
-        capitalData = rows.map(row => {
-          const cols = row.split(",");
-          return {
-            ID: cols[0].trim(),
-            Begin: cols[1].trim(),
-            End: cols[2].trim(),
-            Capital: cols[3].trim(),
-            Lat: parseFloat(cols[4]),
-            Lon: parseFloat(cols[5])
-          };
-        });
+function parseCapsCSV( text ) {
+  const rows = text.split( "\n" ).slice( 1 ).filter( r => r.trim() !== "" );
 
-        console.log("Capitals loaded:", capitalData.length);
+  return rows.map( row => {
+    const cols = row.split( "," );
+    return {
+      ID:      cols[ 0 ].trim(),
+      Begin:   parseInt( cols[ 1 ], 10 ),
+      End:     parseInt( cols[ 2 ], 10 ),
+      Capital: cols[ 3 ].trim(),
+      Lat:     parseFloat( cols[ 4 ] ),
+      Lon:     parseFloat( cols[ 5 ] )
+    };
+  } );
+}
 
-        return fetch("world50.geojson");
-      });
+// -------------------------
+// Controls
+// -------------------------
 
+slider.addEventListener( "input", function () {
+  selectedDate        = monthIndexToDate( parseInt( this.value, 10 ) );
+  display.innerText   = formatSliderDate( selectedDate );
+  dateInput.value     = selectedDate.toString();
 
-    console.log("Sovereignty loaded:", sovData.length);
+  console.log( "Slider moved:", selectedDate );
+  updateMapByDate();
+} );
 
-  })
-  .then(response => response.json())
-  .then(data => {
+dateInput.addEventListener( "change", function () {
+  const raw = this.value.trim();
+  const val = parseInt( raw, 10 );
 
-    const southAmericaLayer = L.geoJSON(data, {
-      filter: function (feature) {
-        return feature.properties.CONTINENT === "South America";
-      },
+  if ( isNaN( val ) || raw.length !== 8 ) {
+    alert( "Enter date as YYYYMMDD" );
+    this.value = selectedDate.toString();
+    return;
+  }
 
-      style: function (feature) {
+  selectedDate      = val;
+  slider.value      = dateToMonthIndex( selectedDate );
+  display.innerText = formatSliderDate( selectedDate );
 
-        const countryName = feature.properties.NAME;
-        const matches = sovData.filter(row => row.Name === countryName);
-        const fill = matches.length > 0 ? matches[0].Color : "#cccccc";
+  console.log( "Date entered:", selectedDate );
+  updateMapByDate();
+} );
 
-        return {
-          fillColor: fill,
-          fillOpacity: 0.5,
-          color: "#222",
-          weight: 1.5
-        };
-      },
+document.getElementById( "stepBack" ).addEventListener( "click", () => {
+  const v = parseInt( slider.value, 10 );
 
-      onEachFeature: function (feature, layer) {
-        const name = feature.properties.NAME;
+  if ( v > parseInt( slider.min, 10 ) ) {
+    slider.value = v - 1;
+    slider.dispatchEvent( new Event( "input" ) );
+  }
+} );
 
-        // compute position
-        let labelLatLng = layer.getBounds().getCenter();
+document.getElementById( "stepForward" ).addEventListener( "click", () => {
+  const v = parseInt( slider.value, 10 );
 
-        // you can still override manually if desired
-        if (name === "Chile") labelLatLng = [-33, -71];
-        if (name === "Argentina") labelLatLng = [-38, -63];
+  if ( v < parseInt( slider.max, 10 ) ) {
+    slider.value = v + 1;
+    slider.dispatchEvent( new Event( "input" ) );
+  }
+} );
 
-        L.marker(labelLatLng, {
-          icon: L.divIcon({
-            className: "country-label",
-            html: name,
-            iconSize: [100, 40],      // give it real size
-            iconAnchor: [50, 20]      // center anchor
-          }),
-          interactive: false
-        }).addTo(MyMap);
+// -------------------------
+// Capitals
+// -------------------------
 
-        layer.on("click", function () {
-
-          const matches = sovData.filter(row => row.Name === name);
-
-          document.getElementById("info").innerText =
-            matches.map(m =>
-              m.Name + " — " + m.PolityID + " (" +
-              formatDate(m.StartDate) + " — " +
-              formatDate(m.EndDate) + ")"
-            ).join("\n");
-
-        });
-      }
-    });
-
-    southAmericaLayer.addTo(MyMap);
-  });
-
-MyMap.on("zoomend", updateCapitals);
-updateCapitals();
+MyMap.on( "zoomend", updateCapitals );
 
 function updateCapitals() {
   capitalLayer.clearLayers();
 
+  if ( !southAmericaLayer ) return;
   if ( !worldLayer ) return;
 
   const zoom = MyMap.getZoom();
@@ -257,6 +255,9 @@ async function updateMapByDate() {
   labelLayer.clearLayers();
   capitalLayer.clearLayers();
 
+  if ( southAmericaLayer ) {
+    MyMap.removeLayer( southAmericaLayer );
+    southAmericaLayer = null;
   if ( worldLayer ) {
     MyMap.removeLayer( worldLayer );
     worldLayer = null;
@@ -300,6 +301,7 @@ async function updateMapByDate() {
     )
   );
 
+  southAmericaLayer = L.geoJSON( layers.flatMap( layer => layer.features ), {
   worldLayer = L.geoJSON( layers, {
     style: function ( feature ) {
       const matchGeo = activeGeo.find( g => g.File === feature.properties.TAFile );
@@ -356,15 +358,28 @@ async function updateMapByDate() {
   updateCapitals();
 }
 
-const slider = document.getElementById("yearSlider");
-const display = document.getElementById("yearDisplay");
+// -------------------------
+// Initial data load
+// -------------------------
 
-slider.addEventListener("input", function () {
+Promise.all( [
+  fetch( "SAgeo.csv" ).then( r => r.text() ),
+  fetch( "SALite.csv" ).then( r => r.text() ),
+  fetch( "SACaps.csv" ).then( r => r.text() )
+  fetch( "worldgeo.csv" ).then( r => r.text() ),
+  fetch( "worldsov.csv" ).then( r => r.text() ),
+  fetch( "worldcaps.csv" ).then( r => r.text() )
+] )
+  .then( ( [ geoText, sovText, capText ] ) => {
+    geoData     = parseGeoCSV( geoText );
+    sovData     = parseSovCSV( sovText );
+    capitalData = parseCapsCSV( capText );
 
-  selectedYear = parseInt(this.value);
-  display.innerText = selectedYear;
+    console.log( "TA geometry rows loaded:", geoData.length );
+    console.log( "Sovereignty loaded:", sovData.length );
+    console.log( "Capitals loaded:", capitalData.length );
 
-  console.log("Slider moved:", selectedYear);
-  
-  updateMapByYear();
-});
+    updateMapByDate();
+  } )
+  .catch( err => {
+    console.error( "Initial load failed:", err );
