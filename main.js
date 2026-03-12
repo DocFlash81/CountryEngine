@@ -1,7 +1,7 @@
 console.log( "JS loaded" );
 
 let selectedDate      = 20260101;
-let southAmericaLayer = null;
+let worldLayer = null;
 
 const slider    = document.getElementById( "yearSlider" );
 const display   = document.getElementById( "yearDisplay" );
@@ -26,7 +26,7 @@ function formatDate( yyyymmdd ) {
 }
 
 function monthIndexToDate( idx ) {
-  const startYear = 1800;
+  const startYear = 1700;
   const year  = startYear + Math.floor( idx / 12 );
   const month = ( idx % 12 ) + 1;
   return year * 10000 + month * 100 + 1;
@@ -207,7 +207,7 @@ MyMap.on( "zoomend", updateCapitals );
 function updateCapitals() {
   capitalLayer.clearLayers();
 
-  if ( !southAmericaLayer ) return;
+  if ( !worldLayer ) return;
 
   const zoom = MyMap.getZoom();
   if ( zoom < 5 ) return;
@@ -252,9 +252,9 @@ async function updateMapByDate() {
   labelLayer.clearLayers();
   capitalLayer.clearLayers();
 
-  if ( southAmericaLayer ) {
-    MyMap.removeLayer( southAmericaLayer );
-    southAmericaLayer = null;
+  if ( worldLayer ) {
+    MyMap.removeLayer( worldLayer );
+    worldLayer = null;
   }
 
   const y = selectedDate;
@@ -295,7 +295,7 @@ async function updateMapByDate() {
     )
   );
 
-  southAmericaLayer = L.geoJSON( layers.flatMap( layer => layer.features ), {
+  worldLayer = L.geoJSON( layers, {
     style: function ( feature ) {
       const matchGeo = activeGeo.find( g => g.File === feature.properties.TAFile );
 
@@ -356,9 +356,9 @@ async function updateMapByDate() {
 // -------------------------
 
 Promise.all( [
-  fetch( "SAgeo.csv" ).then( r => r.text() ),
-  fetch( "SALite.csv" ).then( r => r.text() ),
-  fetch( "SACaps.csv" ).then( r => r.text() )
+  fetch( "worldgeo.csv" ).then( r => r.text() ),
+  fetch( "worldsov.csv" ).then( r => r.text() ),
+  fetch( "worldcaps.csv" ).then( r => r.text() )
 ] )
   .then( ( [ geoText, sovText, capText ] ) => {
     geoData     = parseGeoCSV( geoText );
