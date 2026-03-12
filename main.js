@@ -1,247 +1,247 @@
-console.log( "JS loaded" );
+console.log("JS loaded");
 
-let selectedDate      = 20260101;
+let selectedDate = 20260101;
 let worldLayer = null;
 
-const slider    = document.getElementById( "yearSlider" );
-const display   = document.getElementById( "yearDisplay" );
-const dateInput = document.getElementById( "dateInput" );
+const slider = document.getElementById("yearSlider");
+const display = document.getElementById("yearDisplay");
+const dateInput = document.getElementById("dateInput");
 
 // -------------------------
 // Date helpers
 // -------------------------
 
-function formatDate( yyyymmdd ) {
+function formatDate(yyyymmdd) {
   const s = yyyymmdd.toString();
-  const year  = s.substring( 0, 4 );
-  const month = s.substring( 4, 6 );
-  const day   = s.substring( 6, 8 );
+  const year = s.substring(0, 4);
+  const month = s.substring(4, 6);
+  const day = s.substring(6, 8);
 
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
-  return `${year} ${monthNames[ parseInt( month, 10 ) - 1 ]} ${parseInt( day, 10 )}`;
+  return `${year} ${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
 }
 
-function monthIndexToDate( idx ) {
+function monthIndexToDate(idx) {
   const startYear = 1700;
-  const year  = startYear + Math.floor( idx / 12 );
-  const month = ( idx % 12 ) + 1;
+  const year = startYear + Math.floor(idx / 12);
+  const month = (idx % 12) + 1;
   return year * 10000 + month * 100 + 1;
 }
 
-function dateToMonthIndex( yyyymmdd ) {
+function dateToMonthIndex(yyyymmdd) {
   const startYear = 1800;
-  const year  = Math.floor( yyyymmdd / 10000 );
-  const month = Math.floor( ( yyyymmdd % 10000 ) / 100 );
-  return ( year - startYear ) * 12 + ( month - 1 );
+  const year = Math.floor(yyyymmdd / 10000);
+  const month = Math.floor((yyyymmdd % 10000) / 100);
+  return (year - startYear) * 12 + (month - 1);
 }
 
-function formatSliderDate( yyyymmdd ) {
-  const year  = Math.floor( yyyymmdd / 10000 );
-  const month = Math.floor( ( yyyymmdd % 10000 ) / 100 );
+function formatSliderDate(yyyymmdd) {
+  const year = Math.floor(yyyymmdd / 10000);
+  const month = Math.floor((yyyymmdd % 10000) / 100);
 
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
-  return `${year} ${monthNames[ month - 1 ]}`;
+  return `${year} ${monthNames[month - 1]}`;
 }
 
 // -------------------------
 // Slider initialization
 // -------------------------
 
-slider.min   = 0;
-slider.max   = ( 2026 - 1800 ) * 12 + 11;
-slider.value = dateToMonthIndex( selectedDate );
+slider.min = 0;
+slider.max = (2026 - 1800) * 12 + 11;
+slider.value = dateToMonthIndex(selectedDate);
 
-display.innerText   = formatSliderDate( selectedDate );
-dateInput.value     = selectedDate.toString();
+display.innerText = formatSliderDate(selectedDate);
+dateInput.value = selectedDate.toString();
 
 // -------------------------
 // Create the map
 // -------------------------
 
-const MyMap = L.map( "mapbox" ).setView( [ -15, -60 ], 4 );
+const MyMap = L.map("mapbox").setView([-15, -60], 4);
 
-L.tileLayer( "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png", {
   attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
-} ).addTo( MyMap );
+}).addTo(MyMap);
 
 // permanent white background
 const backgroundLayer = L.rectangle(
-  [ [ -90, -180 ], [ 90, 180 ] ],
+  [[-90, -180], [90, 180]],
   { color: null, fillColor: "#ffffff", fillOpacity: 1, interactive: false }
-).addTo( MyMap );
+).addTo(MyMap);
 
-let labelLayer   = L.layerGroup().addTo( MyMap );
-let capitalLayer = L.layerGroup().addTo( MyMap );
+let labelLayer = L.layerGroup().addTo(MyMap);
+let capitalLayer = L.layerGroup().addTo(MyMap);
 
 // -------------------------
 // Icons
 // -------------------------
 
-const capitalIcon = L.divIcon( {
+const capitalIcon = L.divIcon({
   className: "capital-icon",
   html: "★",
-  iconSize: [ 18, 18 ],
-  iconAnchor: [ 9, 9 ]
-} );
+  iconSize: [18, 18],
+  iconAnchor: [9, 9]
+});
 
 // -------------------------
 // Data containers
 // -------------------------
 
-let geoData     = [];
-let sovData     = [];
+let geoData = [];
+let sovData = [];
 let capitalData = [];
 
 // -------------------------
 // CSV parsing helpers
 // -------------------------
 
-function parseGeoCSV( text ) {
-  const rows = text.split( "\n" ).slice( 1 ).filter( r => r.trim() !== "" );
+function parseGeoCSV(text) {
+  const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
 
-  return rows.map( row => {
-    const c = row.split( "," );
+  return rows.map(row => {
+    const c = row.split(",");
     return {
-      ID:    c[ 0 ].trim(),
-      Begin: parseInt( c[ 1 ], 10 ),
-      End:   parseInt( c[ 2 ], 10 ),
-      File:  c[ 3 ].trim()
+      ID: c[0].trim(),
+      Begin: parseInt(c[1], 10),
+      End: parseInt(c[2], 10),
+      File: c[3].trim()
     };
-  } );
+  });
 }
 
-function parseSovCSV( text ) {
-  const rows = text.split( "\n" ).slice( 1 ).filter( r => r.trim() !== "" );
+function parseSovCSV(text) {
+  const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
 
-  return rows.map( row => {
-    const cols = row.split( "," );
+  return rows.map(row => {
+    const cols = row.split(",");
     return {
-      PolityID:  cols[ 0 ].trim(),
-      Name:      cols[ 1 ].trim(),
-      StartDate: parseInt( cols[ 2 ], 10 ),
-      EndDate:   parseInt( cols[ 3 ], 10 ),
-      Color:     cols[ 4 ].trim()
+      PolityID: cols[0].trim(),
+      Name: cols[1].trim(),
+      StartDate: parseInt(cols[2], 10),
+      EndDate: parseInt(cols[3], 10),
+      Color: cols[4].trim()
     };
-  } );
+  });
 }
 
-function parseCapsCSV( text ) {
-  const rows = text.split( "\n" ).slice( 1 ).filter( r => r.trim() !== "" );
+function parseCapsCSV(text) {
+  const rows = text.split("\n").slice(1).filter(r => r.trim() !== "");
 
-  return rows.map( row => {
-    const cols = row.split( "," );
+  return rows.map(row => {
+    const cols = row.split(",");
     return {
-      ID:      cols[ 0 ].trim(),
-      Begin:   parseInt( cols[ 1 ], 10 ),
-      End:     parseInt( cols[ 2 ], 10 ),
-      Capital: cols[ 3 ].trim(),
-      Lat:     parseFloat( cols[ 4 ] ),
-      Lon:     parseFloat( cols[ 5 ] )
+      ID: cols[0].trim(),
+      Begin: parseInt(cols[1], 10),
+      End: parseInt(cols[2], 10),
+      Capital: cols[3].trim(),
+      Lat: parseFloat(cols[4]),
+      Lon: parseFloat(cols[5])
     };
-  } );
+  });
 }
 
 // -------------------------
 // Controls
 // -------------------------
 
-slider.addEventListener( "input", function () {
-  selectedDate        = monthIndexToDate( parseInt( this.value, 10 ) );
-  display.innerText   = formatSliderDate( selectedDate );
-  dateInput.value     = selectedDate.toString();
+slider.addEventListener("input", function () {
+  selectedDate = monthIndexToDate(parseInt(this.value, 10));
+  display.innerText = formatSliderDate(selectedDate);
+  dateInput.value = selectedDate.toString();
 
-  console.log( "Slider moved:", selectedDate );
+  console.log("Slider moved:", selectedDate);
   updateMapByDate();
-} );
+});
 
-dateInput.addEventListener( "change", function () {
+dateInput.addEventListener("change", function () {
   const raw = this.value.trim();
-  const val = parseInt( raw, 10 );
+  const val = parseInt(raw, 10);
 
-  if ( isNaN( val ) || raw.length !== 8 ) {
-    alert( "Enter date as YYYYMMDD" );
+  if (isNaN(val) || raw.length !== 8) {
+    alert("Enter date as YYYYMMDD");
     this.value = selectedDate.toString();
     return;
   }
 
-  selectedDate      = val;
-  slider.value      = dateToMonthIndex( selectedDate );
-  display.innerText = formatSliderDate( selectedDate );
+  selectedDate = val;
+  slider.value = dateToMonthIndex(selectedDate);
+  display.innerText = formatSliderDate(selectedDate);
 
-  console.log( "Date entered:", selectedDate );
+  console.log("Date entered:", selectedDate);
   updateMapByDate();
-} );
+});
 
-document.getElementById( "stepBack" ).addEventListener( "click", () => {
-  const v = parseInt( slider.value, 10 );
+document.getElementById("stepBack").addEventListener("click", () => {
+  const v = parseInt(slider.value, 10);
 
-  if ( v > parseInt( slider.min, 10 ) ) {
+  if (v > parseInt(slider.min, 10)) {
     slider.value = v - 1;
-    slider.dispatchEvent( new Event( "input" ) );
+    slider.dispatchEvent(new Event("input"));
   }
-} );
+});
 
-document.getElementById( "stepForward" ).addEventListener( "click", () => {
-  const v = parseInt( slider.value, 10 );
+document.getElementById("stepForward").addEventListener("click", () => {
+  const v = parseInt(slider.value, 10);
 
-  if ( v < parseInt( slider.max, 10 ) ) {
+  if (v < parseInt(slider.max, 10)) {
     slider.value = v + 1;
-    slider.dispatchEvent( new Event( "input" ) );
+    slider.dispatchEvent(new Event("input"));
   }
-} );
+});
 
 // -------------------------
 // Capitals
 // -------------------------
 
-MyMap.on( "zoomend", updateCapitals );
+MyMap.on("zoomend", updateCapitals);
 
 function updateCapitals() {
   capitalLayer.clearLayers();
 
-  if ( !worldLayer ) return;
+  if (!worldLayer) return;
 
   const zoom = MyMap.getZoom();
-  if ( zoom < 5 ) return;
+  if (zoom < 5) return;
 
   const y = selectedDate;
 
-  capitalData.forEach( row => {
+  capitalData.forEach(row => {
     const exists =
       row.Begin <= y &&
-      row.End   >= y;
+      row.End >= y;
 
-    if ( !exists ) return;
+    if (!exists) return;
 
-    const star = L.marker( [ row.Lat, row.Lon ], {
+    const star = L.marker([row.Lat, row.Lon], {
       icon: capitalIcon,
       interactive: false
-    } );
+    });
 
-    star.addTo( capitalLayer );
+    star.addTo(capitalLayer);
 
-    if ( zoom >= 6 ) {
-      const label = L.marker( [ row.Lat, row.Lon ], {
-        icon: L.divIcon( {
+    if (zoom >= 6) {
+      const label = L.marker([row.Lat, row.Lon], {
+        icon: L.divIcon({
           className: "capital-label",
           html: row.Capital,
-          iconSize: [ 120, 20 ],
-          iconAnchor: [ 60, -10 ]
-        } ),
+          iconSize: [120, 20],
+          iconAnchor: [60, -10]
+        }),
         interactive: false
-      } );
+      });
 
-      label.addTo( capitalLayer );
+      label.addTo(capitalLayer);
     }
-  } );
+  });
 }
 
 // -------------------------
@@ -249,68 +249,53 @@ function updateCapitals() {
 // -------------------------
 
 async function updateMapByDate() {
+  const myVersion = ++renderVersion;
+
   labelLayer.clearLayers();
   capitalLayer.clearLayers();
 
-  if ( worldLayer ) {
-    MyMap.removeLayer( worldLayer );
+  if (worldLayer) {
+    MyMap.removeLayer(worldLayer);
     worldLayer = null;
   }
 
   const y = selectedDate;
 
-  const activePolities = sovData.filter( p =>
+  const activePolities = sovData.filter(p =>
     p.StartDate <= y &&
-    p.EndDate   >= y
+    p.EndDate >= y
   );
 
-  console.log( "ACTIVE POLITIES:", activePolities.map( p => p.PolityID ) );
-
-  const activeGeo = geoData.filter( g =>
-    activePolities.some( p => p.PolityID === g.ID ) &&
+  const activeGeo = geoData.filter(g =>
+    activePolities.some(p => p.PolityID === g.ID) &&
     g.Begin <= y &&
-    g.End   >= y
+    g.End >= y
   );
 
-  const filesNeeded = [ ...new Set( activeGeo.map( g => g.File ) ) ];
-
-  if ( filesNeeded.length === 0 ) {
-    updateCapitals();
-    return;
-  }
+  const filesNeeded = [...new Set(activeGeo.map(g => g.File))];
 
   const layers = await Promise.all(
-    filesNeeded.map( f =>
-      fetch( `Geojson/${f}.geojson` )
-        .then( r => r.json() )
-        .then( data => {
-          data.features.forEach( feat => {
-            if ( !feat.properties ) {
-              feat.properties = {};
-            }
+    filesNeeded.map(f =>
+      fetch(`Geojson/${f}.geojson`)
+        .then(r => r.json())
+        .then(data => {
+          data.features.forEach(feat => {
+            if (!feat.properties) feat.properties = {};
             feat.properties.TAFile = f;
-          } );
+          });
           return data;
-        } )
+        })
     )
   );
 
-  worldLayer = L.geoJSON( layers, {
-    style: function ( feature ) {
-      const matchGeo = activeGeo.find( g => g.File === feature.properties.TAFile );
+  if (myVersion !== renderVersion) return;
 
-      if ( !matchGeo ) {
-        return {
-          fillColor: "#ccc",
-          fillOpacity: 0.2,
-          color: "#222",
-          weight: 1
-        };
-      }
-
-      const polity = activePolities.find( p => p.PolityID === matchGeo.ID );
-
-      console.log( "COLOR DEBUG:", feature.properties.TAFile, matchGeo.ID );
+  worldLayer = L.geoJSON(layers, {
+    style: function (feature) {
+      const matchGeo = activeGeo.find(g => g.File === feature.properties.TAFile);
+      const polity = matchGeo
+        ? activePolities.find(p => p.PolityID === matchGeo.ID)
+        : null;
 
       return {
         fillColor: polity?.Color || "#ccc",
@@ -319,34 +304,9 @@ async function updateMapByDate() {
         weight: 1.5
       };
     }
-  } ).addTo( MyMap );
+  }).addTo(MyMap);
 
-  activeGeo.forEach( g => {
-    const polity = activePolities.find( p => p.PolityID === g.ID );
-    if ( !polity ) return;
-
-    const matchingLayerData = layers.find( l =>
-      l.features &&
-      l.features.length > 0 &&
-      l.features[ 0 ].properties &&
-      l.features[ 0 ].properties.TAFile === g.File
-    );
-
-    if ( !matchingLayerData ) return;
-
-    const geoLayer = L.geoJSON( matchingLayerData );
-    const center   = geoLayer.getBounds().getCenter();
-
-    L.marker( center, {
-      icon: L.divIcon( {
-        className: "country-label",
-        html: polity.Name,
-        iconSize: [ 100, 40 ],
-        iconAnchor: [ 50, 20 ]
-      } ),
-      interactive: false
-    } ).addTo( labelLayer );
-  } );
+  if (myVersion !== renderVersion) return;
 
   updateCapitals();
 }
@@ -355,22 +315,22 @@ async function updateMapByDate() {
 // Initial data load
 // -------------------------
 
-Promise.all( [
-  fetch( "worldgeo.csv" ).then( r => r.text() ),
-  fetch( "worldsov.csv" ).then( r => r.text() ),
-  fetch( "worldcaps.csv" ).then( r => r.text() )
-] )
-  .then( ( [ geoText, sovText, capText ] ) => {
-    geoData     = parseGeoCSV( geoText );
-    sovData     = parseSovCSV( sovText );
-    capitalData = parseCapsCSV( capText );
+Promise.all([
+  fetch("worldgeo.csv").then(r => r.text()),
+  fetch("worldsov.csv").then(r => r.text()),
+  fetch("worldcaps.csv").then(r => r.text())
+])
+  .then(([geoText, sovText, capText]) => {
+    geoData = parseGeoCSV(geoText);
+    sovData = parseSovCSV(sovText);
+    capitalData = parseCapsCSV(capText);
 
-    console.log( "TA geometry rows loaded:", geoData.length );
-    console.log( "Sovereignty loaded:", sovData.length );
-    console.log( "Capitals loaded:", capitalData.length );
+    console.log("TA geometry rows loaded:", geoData.length);
+    console.log("Sovereignty loaded:", sovData.length);
+    console.log("Capitals loaded:", capitalData.length);
 
     updateMapByDate();
-  } )
-  .catch( err => {
-    console.error( "Initial load failed:", err );
-  } );
+  })
+  .catch(err => {
+    console.error("Initial load failed:", err);
+  });
