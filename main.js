@@ -26,14 +26,14 @@ function formatDate(yyyymmdd) {
 }
 
 function monthIndexToDate(idx) {
-  const startYear = 1700;
+  const startYear = 1600;
   const year = startYear + Math.floor(idx / 12);
   const month = (idx % 12) + 1;
   return year * 10000 + month * 100 + 1;
 }
 
 function dateToMonthIndex(yyyymmdd) {
-  const startYear = 1800;
+  const startYear = 1600;
   const year = Math.floor(yyyymmdd / 10000);
   const month = Math.floor((yyyymmdd % 10000) / 100);
   return (year - startYear) * 12 + (month - 1);
@@ -56,7 +56,7 @@ function formatSliderDate(yyyymmdd) {
 // -------------------------
 
 slider.min = 0;
-slider.max = (2026 - 1800) * 12 + 11;
+slider.max = (2026 - 1600) * 12 + 11;
 slider.value = dateToMonthIndex(selectedDate);
 
 display.innerText = formatSliderDate(selectedDate);
