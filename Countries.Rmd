@@ -1,0 +1,53 @@
+---
+title: "Countries"
+output: word_document
+date: "2026-02-10"
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+library( tidyverse )
+library( ggplot2 )
+
+```
+
+
+```{r}
+
+df <- read_excel( "Countries.xlsx", sheet = "Sheet1" ) %>%
+    mutate( AreaRank   = rank( -Area ),
+            PopRank.   = rank( -Pop ),
+            YearRank   = rank( Year ),
+            CapPopRank = rank( -CapPop ),
+            DensRank   = rank( -Density ),
+            ShareRank  = rank( -CityShare ) ) %>%
+    data.frame()
+
+
+ggplot( df, aes( x = AreaRank, y = PopRank, label = Country, color = Continent ) ) +
+  geom_point() +
+  geom_text( size = 3, check_overlap = TRUE ) +
+  theme_minimal()
+
+ggplot( df, aes( x = log1p( Area ), y = log1p( Pop ), label = Country, color = Continent ) ) +
+  geom_point() +
+  geom_text( size = 3, check_overlap = TRUE ) +
+  geom_smooth( method = "lm", se     = FALSE ) +
+  theme_minimal()
+
+
+ggplot(
+  df, aes( x     = log1p(Area), y     = log1p(Pop), color = Continent ) ) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_ellipse( type  = "norm", level = 0.68, linewidth = 1 ) +
+  theme_minimal()
+
+
+ggplot( df, aes( x = log1p( CityShare ), y = log1p( Pop ), label = Country, color = Continent ) ) +
+  geom_point() +
+  geom_text( size = 3, check_overlap = TRUE ) +
+  geom_smooth( method = "lm", se     = FALSE ) +
+  theme_minimal()
+```
