@@ -1,7 +1,15 @@
 console.log("JS loaded");
 
-let selectedYear = 2026;
+let selectedDate = 20260101;
 let southAmericaLayer;
+
+const slider = document.getElementById("yearSlider");
+const display = document.getElementById("yearDisplay");
+const dateInput = document.getElementById("dateInput");
+
+slider.min = 0;
+slider.max = (2026 - 1800) * 12 + 11;
+slider.value = dateToMonthIndex(selectedDate);
 
 // Create the map
 const MyMap = L.map('mapbox').setView([-15, -60], 4);
@@ -24,12 +32,74 @@ function formatDate(yyyymmdd) {
   return `${year} ${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`;
 }
 
+function monthIndexToDate(idx) {
+  const startYear = 1800;
+  const year = startYear + Math.floor(idx / 12);
+  const month = (idx % 12) + 1;
+  return year * 10000 + month * 100 + 1;   // YYYYMM01
+}
+
+function dateToMonthIndex(yyyymmdd) {
+  const startYear = 1800;
+  const year = Math.floor(yyyymmdd / 10000);
+  const month = Math.floor((yyyymmdd % 10000) / 100);
+  return (year - startYear) * 12 + (month - 1);
+}
+
+function formatSliderDate(yyyymmdd) {
+  const year = Math.floor(yyyymmdd / 10000);
+  const month = Math.floor((yyyymmdd % 10000) / 100);
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+  return `${year} ${monthNames[month - 1]}`;
+}
+
 // Star for capitals
 const capitalIcon = L.divIcon({
   className: "capital-icon",
   html: "★",
   iconSize: [18, 18],
   iconAnchor: [9, 9]
+});
+
+slider.addEventListener("input", function () {
+  selectedDate = monthIndexToDate(parseInt(this.value, 10));
+  display.innerText = formatSliderDate(selectedDate);
+  dateInput.value = selectedDate.toString();
+  updateMapByDate();
+});
+
+dateInput.addEventListener("change", function () {
+  const val = parseInt(this.value, 10);
+
+  if (isNaN(val) || this.value.length !== 8) {
+    alert("Enter date as YYYYMMDD");
+    this.value = selectedDate.toString();
+    return;
+  }
+
+  selectedDate = val;
+  slider.value = dateToMonthIndex(selectedDate);
+  display.innerText = formatSliderDate(selectedDate);
+  updateMapByDate();
+});
+
+document.getElementById("stepBack").addEventListener("click", () => {
+  let v = parseInt(slider.value, 10);
+  if (v > parseInt(slider.min, 10)) {
+    slider.value = v - 1;
+    slider.dispatchEvent(new Event("input"));
+  }
+});
+
+document.getElementById("stepForward").addEventListener("click", () => {
+  let v = parseInt(slider.value, 10);
+  if (v < parseInt(slider.max, 10)) {
+    slider.value = v + 1;
+    slider.dispatchEvent(new Event("input"));
+  }
 });
 
 // load geojson dataset
@@ -102,7 +172,7 @@ fetch("SALite.csv")
           fetch("SAgeo.csv").then(r => r.text()),
           fetch("SALite.csv").then(r => r.text())
         ]).then(() => {
-          updateMapByYear();
+          updateMapByDate();
         });
       });
   })
@@ -120,7 +190,7 @@ function updateCapitals() {
   const zoom = MyMap.getZoom();
   if (zoom < 5) return;
 
-  const y = selectedYear * 10000;   // ✅ MOVE HERE
+  const y = selectedDate;
 
   capitalData.forEach(row => {
 
@@ -158,8 +228,8 @@ function updateCapitals() {
 
 }
 
-// updateMapByYear updates the map given the slider year
-async function updateMapByYear() {
+// updateMapByDate updates the map given the slider year
+async function updateMapByDate() {
 
   labelLayer.clearLayers();
 
@@ -172,7 +242,7 @@ async function updateMapByYear() {
   if (southAmericaLayer) {
     MyMap.removeLayer(southAmericaLayer);
   }
-  const y = selectedYear * 10000;
+  const y = selectedDate;
 
   // STEP 1 — active polities
   const activePolities = sovData.filter(p =>
@@ -272,5 +342,5 @@ slider.addEventListener("input", function () {
 
   console.log("Slider moved:", selectedYear);
 
-  updateMapByYear();
+  updateMapByDate();
 });

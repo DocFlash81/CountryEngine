@@ -70,3 +70,50 @@
   font-family: Consolas, monospace;
   font-size: 18px;
 }
+
+#timeControls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(255,255,255,0.92);
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.2);
+}
+
+#yearSlider {
+  flex: 1;
+  min-width: 300px;
+}
+
+#dateInput {
+  width: 100px;
+  font-family: monospace;
+  text-align: center;
+}
+
+#yearDisplay {
+  min-width: 90px;
+  font-size: 14px;
+}
+
+@media (max-width: 700px) {
+  #timeControls {
+    flex-wrap: wrap;
+  }
+
+  #yearSlider {
+    width: 100%;
+    min-width: 0;
+    order: 3;
+  }
+
+  #dateInput, #yearDisplay {
+    font-size: 16px;
+  }
+}
