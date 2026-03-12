@@ -312,6 +312,7 @@ async function updateMapByDate() {
   updateCapitals();
 }
 
+
 // -------------------------
 // Initial data load
 // -------------------------
